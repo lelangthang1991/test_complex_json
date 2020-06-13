@@ -1,0 +1,9 @@
+.idea
+venv
+.venv
+log.html
+output.xml
+report.html
+*~lock*
+*/__pycache__/
+__pycache__/
