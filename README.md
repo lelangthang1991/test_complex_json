@@ -2,8 +2,7 @@
 
 Introduction to project
 
-### install requirements ###
-```shell
+### Install requirements ###
+```shell script
 pip install -r requirements.txt
-
 ```

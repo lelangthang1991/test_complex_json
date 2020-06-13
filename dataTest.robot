@@ -54,7 +54,7 @@ Dump Result To File
 Check Dict Value
     [Arguments]      ${dict}
     FOR    ${elm}    IN    @{dict.keys()}
-        ${isRefValue}    Evaluate    '[ref]' in '${dict["${elm}"]}'
+        ${isRefValue}    Evaluate    "[ref]" in "${dict["${elm}"]}"
         Continue For Loop If    ${isRefValue} == ${False}
         ${value}    Get ref value    ${dict["${elm}"]}
 
