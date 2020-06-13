@@ -48,6 +48,7 @@ Dump Result To File
     ${output}    catenate    ./outputdata.json
     ${output}    Join Path    ${CURDIR}    ${output}
     ${json}    convert to String    ${expected}
+    ${json}    Replace String   ${json}    '    "
     Create File    ${output}    ${json}
 
 Check Dict Value
