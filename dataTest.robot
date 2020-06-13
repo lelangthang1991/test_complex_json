@@ -16,6 +16,7 @@ Unitest001
     Provided precondition
     When Load Data From Excel File
     Then Check Result
+    And Dump Result To File
 
 *** Keywords ***
 Provided precondition
@@ -41,7 +42,13 @@ Check Result
     END
     Log    ${res}
     Log    ${expected}
-    Dictionaries Should Be Equal    ${res}    ${expected}    ${dataTest}    values=True
+    Run Keyword And Continue On Failure    Dictionaries Should Be Equal    ${res}    ${expected}    ${dataTest}    values=True
+
+Dump Result To File
+    ${output}    catenate    ./outputdata.json
+    ${output}    Join Path    ${CURDIR}    ${output}
+    ${json}    convert to String    ${expected}
+    Create File    ${output}    ${json}
 
 Check Dict Value
     [Arguments]      ${dict}
