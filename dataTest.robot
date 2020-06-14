@@ -17,7 +17,7 @@ Unitest001
     When Load Data From Excel File
     Then Check Result
     And Check All Single Fields Value
-    And Dump Result To File
+    And Dump Expectation To File
 
 *** Keywords ***
 Provided precondition
@@ -93,7 +93,7 @@ Validate List
         Log    ${expected}[${index}]
         Run Keyword And Continue On Failure    Should Be Equal    ${actual}[${index}]    ${expected}[${index}]    \n${index}    values=True
     END
-Dump Result To File
+Dump Expectation To File
     ${output}    catenate    ./outputdata.json
     ${output}    Join Path    ${CURDIR}    ${output}
     ${json}    convert to String    ${expected}
