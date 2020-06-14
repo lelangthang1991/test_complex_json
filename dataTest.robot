@@ -81,7 +81,6 @@ Validate Dictionary
         Log    ${expectation["${field}"]}
         Run Keyword And Continue On Failure    Should Be Equal    ${actual["${field}"]}    ${expectation["${field}"]}    \n${field}    values=True
     END
-    Log    ${actual}
 
 Validate List
     [Arguments]      ${actual}    ${expected}
