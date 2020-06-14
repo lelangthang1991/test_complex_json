@@ -29,7 +29,10 @@ Provided precondition
 Load Data From Excel File
     ${dataTest}    Join Path   ${CURDIR}    ${dataTest}
     Set Test Variable    ${dataTest}    ${dataTest}
+    # Get initial data
     ${dict}    Get Data From Excel    DATA    1
+    ${initDict}=    Set Variable    ${dict}
+    # User should get request and response separately
     Check Dict Value    ${dict}
     log    ${dict}
     Set Test Variable    ${expected}    ${dict}
