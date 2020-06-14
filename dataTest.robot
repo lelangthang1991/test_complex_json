@@ -9,13 +9,14 @@ Library    ./libs.py
 
 *** Variables ***
 ${dataTest}    ./testData.xlsx
-
+@{IGNORE}    id    otherfield
 *** Test Cases ***
 Unitest001
     [Tags]    DEBUG
     Provided precondition
     When Load Data From Excel File
     Then Check Result
+    And Check All Single Fields Value
     And Dump Result To File
 
 *** Keywords ***
@@ -47,6 +48,52 @@ Check Result
     Log    ${expected}
     Run Keyword And Continue On Failure    Dictionaries Should Be Equal    ${res}    ${expected}    ${dataTest}    values=True
 
+Check All Single Fields Value
+    FOR    ${field}    IN    @{res.keys()}
+        ${isIgnored}    Evaluate    "${field}" in "${IGNORE}"
+        Run Keyword If    ${isIgnored}    Dictionary Should Contain Key    ${res}    ${field}    ${field}
+        Continue For Loop If    ${isIgnored}
+        ${isDict}    Run Keyword And Return Status    Get Dictionary Items    ${res["${field}"]}
+        ${isList}    Run Keyword And Return Status    Evaluate    "${res["${field}"]}[1]" != ${None}
+        Run Keyword If    ${isDict}    Validate Dictionary    ${res["${field}"]}    ${expected["${field}"]}
+        Continue For Loop If    ${isDict}
+        Run Keyword If    ${isList}    Validate List    ${res["${field}"]}    ${expected["${field}"]}
+        Continue For Loop If    ${isList}
+        Log    ${res["${field}"]}
+        Log    ${expected["${field}"]}
+        Run Keyword And Continue On Failure    Should Be Equal    ${res["${field}"]}    ${expected["${field}"]}    \n${field}    values=True
+    END
+
+
+Validate Dictionary
+    [Arguments]      ${actual}    ${expectation}
+    FOR    ${field}    IN    @{actual.keys()}
+        ${isIgnored}    Evaluate    "${field}" in "${IGNORE}"
+        Run Keyword If    ${isIgnored}    Dictionary Should Contain Key    ${actual}    ${field}    ${field}
+        Continue For Loop If    ${isIgnored}
+        ${isList}    Run Keyword And Return Status    Evaluate   "${actual["${field}"]}[1]" != ${None}
+        Run Keyword If    ${isList}    Validate List    ${actual["${field}"]}    ${expectation["${field}"]}
+        Continue For Loop If    ${isList}
+        ${isDict}    Run Keyword And Return Status    Get Dictionary Items    ${actual["${field}"]}
+        Run Keyword If    ${isDict}    Validate Dictionary    ${actual["${field}"]}    ${expectation["${field}"]}
+        Continue For Loop If    ${isDict}
+        Log    ${actual["${field}"]}
+        Log    ${expectation["${field}"]}
+        Run Keyword And Continue On Failure    Should Be Equal    ${actual["${field}"]}    ${expectation["${field}"]}    \n${field}    values=True
+    END
+    Log    ${actual}
+
+Validate List
+    [Arguments]      ${actual}    ${expected}
+    FOR    ${item}    IN    @{actual}
+        ${index}    Get Index From List    ${actual}    ${item}
+        ${isDict}    Run Keyword And Return Status    Get Dictionary Items    ${actual}[${index}]
+        Run Keyword If    ${isDict}    Validate Dictionary    ${actual}[${index}]    ${expected}[${index}]
+        Continue For Loop If    ${isDict}
+        Log    ${actual}[${index}]
+        Log    ${expected}[${index}]
+        Run Keyword And Continue On Failure    Should Be Equal    ${actual}[${index}]    ${expected}[${index}]    \n${index}    values=True
+    END
 Dump Result To File
     ${output}    catenate    ./outputdata.json
     ${output}    Join Path    ${CURDIR}    ${output}
