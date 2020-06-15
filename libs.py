@@ -11,3 +11,9 @@ def get_digit_number_in_string(string):
     return g
 def extract_number(string):
     return (re.findall('\d+', string))[0]
+
+def get_variable_type(variable):
+    v = type(variable)
+    string = (str(v).split('\''))
+    t = string[1]
+    return t

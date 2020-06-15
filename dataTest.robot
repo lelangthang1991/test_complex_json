@@ -53,12 +53,13 @@ Check All Single Fields Value
         ${isIgnored}    Evaluate    "${field}" in "${IGNORE}"
         Run Keyword If    ${isIgnored}    Dictionary Should Contain Key    ${res}    ${field}    ${field}
         Continue For Loop If    ${isIgnored}
-        ${isDict}    Run Keyword And Return Status    Get Dictionary Items    ${res["${field}"]}
-        ${isList}    Run Keyword And Return Status    Evaluate    "${res["${field}"]}[1]" != ${None}
-        Run Keyword If    ${isDict}    Validate Dictionary    ${res["${field}"]}    ${expected["${field}"]}
-        Continue For Loop If    ${isDict}
-        Run Keyword If    ${isList}    Validate List    ${res["${field}"]}    ${expected["${field}"]}
-        Continue For Loop If    ${isList}
+        ${variableType}    Get Variable Type    ${res["${field}"]}
+#        ${isDict}    Run Keyword And Return Status    Get Dictionary Items    ${res["${field}"]}
+#        ${isList}    Run Keyword And Return Status    Evaluate    "${res["${field}"]}[1]" != ${None}
+        Run Keyword If    '${variableType}' == 'dict'    Validate Dictionary    ${res["${field}"]}    ${expected["${field}"]}
+        Continue For Loop If    '${variableType}' == 'dict'
+        Run Keyword If    '${variableType}' == 'list'    Validate List    ${res["${field}"]}    ${expected["${field}"]}
+        Continue For Loop If    '${variableType}' == 'list'
         Log    ${res["${field}"]}
         Log    ${expected["${field}"]}
         Run Keyword And Continue On Failure    Should Be Equal    ${res["${field}"]}    ${expected["${field}"]}    \n${field}    values=True
@@ -71,12 +72,13 @@ Validate Dictionary
         ${isIgnored}    Evaluate    "${field}" in "${IGNORE}"
         Run Keyword If    ${isIgnored}    Dictionary Should Contain Key    ${actual}    ${field}    ${field}
         Continue For Loop If    ${isIgnored}
-        ${isList}    Run Keyword And Return Status    Evaluate   "${actual["${field}"]}[1]" != ${None}
-        Run Keyword If    ${isList}    Validate List    ${actual["${field}"]}    ${expectation["${field}"]}
-        Continue For Loop If    ${isList}
-        ${isDict}    Run Keyword And Return Status    Get Dictionary Items    ${actual["${field}"]}
-        Run Keyword If    ${isDict}    Validate Dictionary    ${actual["${field}"]}    ${expectation["${field}"]}
-        Continue For Loop If    ${isDict}
+        ${variableType}    Get Variable Type    ${actual["${field}"]}
+#        ${isList}    Run Keyword And Return Status    Evaluate   "${actual["${field}"]}[1]" != ${None}
+        Run Keyword If    '${variableType}' == 'list'    Validate List    ${actual["${field}"]}    ${expectation["${field}"]}
+        Continue For Loop If    '${variableType}' == 'list'
+#        ${isDict}    Run Keyword And Return Status    Get Dictionary Items    ${actual["${field}"]}
+        Run Keyword If    '${variableType}' == 'dict'    Validate Dictionary    ${actual["${field}"]}    ${expectation["${field}"]}
+        Continue For Loop If    '${variableType}' == 'dict'
         Log    ${actual["${field}"]}
         Log    ${expectation["${field}"]}
         Run Keyword And Continue On Failure    Should Be Equal    ${actual["${field}"]}    ${expectation["${field}"]}    \n${field}    values=True
@@ -86,9 +88,10 @@ Validate List
     [Arguments]      ${actual}    ${expected}
     FOR    ${item}    IN    @{actual}
         ${index}    Get Index From List    ${actual}    ${item}
-        ${isDict}    Run Keyword And Return Status    Get Dictionary Items    ${actual}[${index}]
-        Run Keyword If    ${isDict}    Validate Dictionary    ${actual}[${index}]    ${expected}[${index}]
-        Continue For Loop If    ${isDict}
+#        ${isDict}    Run Keyword And Return Status    Get Dictionary Items    ${actual}[${index}]
+        ${variableType}    Get Variable Type    ${actual}[${index}]
+        Run Keyword If    '${variableType}' == 'dict'    Validate Dictionary    ${actual}[${index}]    ${expected}[${index}]
+        Continue For Loop If    '${variableType}' == 'dict'
         Log    ${actual}[${index}]
         Log    ${expected}[${index}]
         Run Keyword And Continue On Failure    Should Be Equal    ${actual}[${index}]    ${expected}[${index}]    \n${index}    values=True
@@ -129,9 +132,8 @@ Get ref value
         ${dict_elm}    Get Data From Excel    ${sheetName}    ${row}
         Append To List    ${dict}    ${dict_elm}
     END
-    Log    ${dict}
-    ${dict_status}    Run Keyword And Return Status    Get Length    ${dict.keys()}
-    Run Keyword If    ${dict_status}    Check Dict Value    ${dict}
+    ${type}    Get Variable Type    ${dict}
+    Run Keyword If    '${type}' == 'dict'    Check Dict Value    ${dict}
     ...    ELSE    Check List Dict    ${dict}
     [Return]    ${dict}
 
